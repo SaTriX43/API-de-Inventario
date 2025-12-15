@@ -32,7 +32,7 @@ namespace API_de_Inventario.Controllers
 
             if(movimientoEntradaCreado.IsFailure)
             {
-                if(movimientoEntradaCreado.Error.Contains("no exite"))
+                if(movimientoEntradaCreado.Error.Contains("no existe"))
                 {
                     return NotFound(new
                     {
@@ -71,7 +71,7 @@ namespace API_de_Inventario.Controllers
 
             if (movimientoSalidaCreado.IsFailure)
             {
-                if (movimientoSalidaCreado.Error.Contains("no exite"))
+                if (movimientoSalidaCreado.Error.Contains("no existe"))
                 {
                     return NotFound(new
                     {
@@ -93,5 +93,7 @@ namespace API_de_Inventario.Controllers
                 valor = movimientoSalidaCreado.Value
             });
         }
+
+
     }
 }

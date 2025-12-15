@@ -94,6 +94,35 @@ namespace API_de_Inventario.Controllers
             });
         }
 
+        [HttpGet("obtener-stock-actual/{productoId}")]
+        public async Task<IActionResult> ObtenerStockActual(int productoId)
+        {
+            var stockActual = await _movimientoService.ObtenerStockActual(productoId);
+
+            if(stockActual.IsFailure)
+            {
+                if (stockActual.Error.Contains("no existe"))
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        error = stockActual.Error
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    success = false,
+                    error = stockActual.Error
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                valor = stockActual.Value
+            });
+        }
 
     }
 }

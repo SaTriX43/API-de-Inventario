@@ -38,22 +38,10 @@ namespace API_de_Inventario.Services
 
             if(movimientoCrearDto.Tipo == TipoMovimiento.Salida)
             {
-                var movimientos = await _movimientoRepository.ObtenerMovimientosPorProducto(movimientoCrearDto.ProductoId);
 
+                var stockActual = await ObtenerStockActual(movimientoCrearDto.ProductoId);
 
-                int stockActual = 0;
-
-                foreach (var movimientoActual in movimientos) { 
-                    if(movimientoActual.Tipo == TipoMovimiento.Entrada)
-                    {
-                        stockActual += movimientoActual.Cantidad;
-                    }else
-                    {
-                        stockActual -= movimientoActual.Cantidad;
-                    }
-                }
-
-                if(movimientoCrearDto.Cantidad > stockActual)
+                if(movimientoCrearDto.Cantidad > stockActual.Value)
                 {
                     return Result<MovimientoDto>.Failure("El stock actual es menor a la cantidad que quieres quitar");
                 }
@@ -81,6 +69,41 @@ namespace API_de_Inventario.Services
             };
 
             return Result<MovimientoDto>.Success(movimientoCreadoDto);
+        }
+
+        public async Task<Result<int>> ObtenerStockActual(int productoId)
+        {
+
+            if(productoId <= 0)
+            {
+                return Result<int>.Failure("El producto id no puede ser menor o igual a 0");
+            }
+
+            var productoExiste = await _productoRepository.ObtenerProductoPorId(productoId);
+
+            if (productoExiste == null)
+            {
+                return Result<int>.Failure($"El producto con id = {productoId} no existe");
+            }
+
+            var movimientos = await _movimientoRepository.ObtenerMovimientosPorProducto(productoId);
+
+
+            int stockActual = 0;
+
+            foreach (var movimientoActual in movimientos)
+            {
+                if (movimientoActual.Tipo == TipoMovimiento.Entrada)
+                {
+                    stockActual += movimientoActual.Cantidad;
+                }
+                else
+                {
+                    stockActual -= movimientoActual.Cantidad;
+                }
+            }
+
+            return Result<int>.Success(stockActual);
         }
     }
 }

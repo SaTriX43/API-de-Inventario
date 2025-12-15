@@ -105,5 +105,33 @@ namespace API_de_Inventario.Services
 
             return Result<int>.Success(stockActual);
         }
+
+        public async Task<Result<List<MovimientoDto>>> ObtenerHistorial(int productoId)
+        {
+            if(productoId <= 0)
+            {
+                return Result<List<MovimientoDto>>.Failure("El producto Id no puede ser menor o igual a 0");
+            }
+
+            var productoExiste = await _productoRepository.ObtenerProductoPorId(productoId);
+
+            if(productoExiste == null)
+            {
+                return Result<List<MovimientoDto>>.Failure($"El producto con id = {productoId} no existe");
+            }
+
+            var movimientosModel = await _movimientoRepository.ObtenerMovimientosPorProducto(productoId);
+
+            var movimientosDtos = movimientosModel.Select(m => new MovimientoDto
+            {
+                Id = m.Id,
+                Cantidad = m.Cantidad,
+                FechaMovimiento = m.FechaMovimiento,
+                ProductoId = m.ProductoId,
+                Tipo = m.Tipo
+            }).ToList();
+
+            return Result<List<MovimientoDto>>.Success(movimientosDtos);
+        }
     }
 }

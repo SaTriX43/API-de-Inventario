@@ -124,5 +124,34 @@ namespace API_de_Inventario.Controllers
             });
         }
 
+        [HttpGet("obtener-historial/{productoId}")]
+        public async Task<IActionResult> ObtenerHistorial(int productoId)
+        {
+            var historial = await _movimientoService.ObtenerHistorial(productoId);
+
+            if (historial.IsFailure)
+            {
+                if (historial.Error.Contains("no existe"))
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        error = historial.Error
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    success = false,
+                    error = historial.Error
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                valor = historial.Value
+            });
+        }
     }
 }

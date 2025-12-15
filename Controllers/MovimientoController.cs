@@ -125,9 +125,16 @@ namespace API_de_Inventario.Controllers
         }
 
         [HttpGet("obtener-historial/{productoId}")]
-        public async Task<IActionResult> ObtenerHistorial(int productoId)
+        public async Task<IActionResult> ObtenerHistorial(
+            int productoId,
+            [FromQuery] DateTime? fechaInicio,
+            [FromQuery] DateTime? fechaFinal,
+            [FromQuery] bool? tipoEntrada,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10
+        )
         {
-            var historial = await _movimientoService.ObtenerHistorial(productoId);
+            var historial = await _movimientoService.ObtenerHistorial(productoId, fechaInicio, fechaFinal,tipoEntrada ,page, pageSize);
 
             if (historial.IsFailure)
             {

@@ -106,7 +106,7 @@ namespace API_de_Inventario.Services
             return Result<int>.Success(stockActual);
         }
 
-        public async Task<Result<List<MovimientoDto>>> ObtenerHistorial(int productoId)
+        public async Task<Result<List<MovimientoDto>>> ObtenerHistorial(int productoId, DateTime? fechaInicio, DateTime? fechaFinal, bool? tipoEntrada, int page, int pageSize)
         {
             if(productoId <= 0)
             {
@@ -120,7 +120,7 @@ namespace API_de_Inventario.Services
                 return Result<List<MovimientoDto>>.Failure($"El producto con id = {productoId} no existe");
             }
 
-            var movimientosModel = await _movimientoRepository.ObtenerMovimientosPorProducto(productoId);
+            var movimientosModel = await _movimientoRepository.ObtenerMovimientosPorProductoConFiltros(productoId, fechaInicio, fechaFinal, tipoEntrada, page,pageSize);
 
             var movimientosDtos = movimientosModel.Select(m => new MovimientoDto
             {

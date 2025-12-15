@@ -5,6 +5,6 @@ namespace API_de_Inventario.Services
 {
     public interface IMovimientoService
     {
-        public Task<Result<MovimientoDto>> CrearMovimientoEntrada(MovimientoCrearDto movimientoEntradaCrearDto);
+        public Task<Result<MovimientoDto>> CrearMovimiento(MovimientoCrearDto movimientoCrearDto);
     }
 }

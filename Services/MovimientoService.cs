@@ -16,30 +16,57 @@ namespace API_de_Inventario.Services
             _productoRepository = productoRepository;
         }
 
-        public async Task<Result<MovimientoDto>> CrearMovimientoEntrada(MovimientoCrearDto movimientoEntradaCrearDto)
+        public async Task<Result<MovimientoDto>> CrearMovimiento(MovimientoCrearDto movimientoCrearDto)
         {
-            if(movimientoEntradaCrearDto.Tipo != TipoMovimiento.Entrada)
-            {
-                return Result<MovimientoDto>.Failure("El tipo de movimiento debe ser de tipo entrada");
-            }
 
-            if(movimientoEntradaCrearDto.ProductoId <= 0)
+            if(movimientoCrearDto.ProductoId <= 0)
             {
                 return Result<MovimientoDto>.Failure("El productId no puede ser menor o igual a 0");
             }
 
-            var productoExiste = await _productoRepository.ObtenerProductoPorId(movimientoEntradaCrearDto.ProductoId);
+            var productoExiste = await _productoRepository.ObtenerProductoPorId(movimientoCrearDto.ProductoId);
 
             if (productoExiste == null)
             {
-                return Result<MovimientoDto>.Failure($"El producto con id = {movimientoEntradaCrearDto.ProductoId} no existe");
+                return Result<MovimientoDto>.Failure($"El producto con id = {movimientoCrearDto.ProductoId} no existe");
             }
+
+            if(movimientoCrearDto.Cantidad <= 0)
+            {
+                return Result<MovimientoDto>.Failure("La cantidad no puede ser menor o igual a 0");
+            }
+
+            if(movimientoCrearDto.Tipo == TipoMovimiento.Salida)
+            {
+                var movimientos = await _movimientoRepository.ObtenerMovimientosPorProducto(movimientoCrearDto.ProductoId);
+
+
+                int stockActual = 0;
+
+                foreach (var movimientoActual in movimientos) { 
+                    if(movimientoActual.Tipo == TipoMovimiento.Entrada)
+                    {
+                        stockActual += movimientoActual.Cantidad;
+                    }else
+                    {
+                        stockActual -= movimientoActual.Cantidad;
+                    }
+                }
+
+                if(movimientoCrearDto.Cantidad > stockActual)
+                {
+                    return Result<MovimientoDto>.Failure("El stock actual es menor a la cantidad que quieres quitar");
+                }
+            }
+
+
 
             var movimientoEntradaModel = new Movimiento
             {
-                ProductoId = movimientoEntradaCrearDto.ProductoId,
-                Cantidad = movimientoEntradaCrearDto.Cantidad,
-                Tipo = movimientoEntradaCrearDto.Tipo
+                ProductoId = movimientoCrearDto.ProductoId,
+                Cantidad = movimientoCrearDto.Cantidad,
+                Tipo = movimientoCrearDto.Tipo,
+                FechaMovimiento = DateTime.UtcNow,
             };
 
             var crearMovimientoEntrada = await _movimientoRepository.CrearMovimiento(movimientoEntradaModel);

@@ -28,7 +28,7 @@ namespace API_de_Inventario.Controllers
                 });
             }
 
-            var movimientoEntradaCreado = await _movimientoService.CrearMovimientoEntrada(movimientoCrearEntrada);
+            var movimientoEntradaCreado = await _movimientoService.CrearMovimiento(movimientoCrearEntrada);
 
             if(movimientoEntradaCreado.IsFailure)
             {
@@ -52,6 +52,45 @@ namespace API_de_Inventario.Controllers
             {
                 success = true,
                 valor = movimientoEntradaCreado.Value
+            });
+        }
+
+        [HttpPost("crear-movimiento-salida")]
+        public async Task<IActionResult> CrearMovimientoSalida([FromBody] MovimientoCrearDto movimientoCrearSalida)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    error = ModelState
+                });
+            }
+
+            var movimientoSalidaCreado = await _movimientoService.CrearMovimiento(movimientoCrearSalida);
+
+            if (movimientoSalidaCreado.IsFailure)
+            {
+                if (movimientoSalidaCreado.Error.Contains("no exite"))
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        error = movimientoSalidaCreado.Error
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    success = false,
+                    error = movimientoSalidaCreado.Error
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                valor = movimientoSalidaCreado.Value
             });
         }
     }

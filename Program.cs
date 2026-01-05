@@ -6,6 +6,7 @@ using API_de_Inventario.Models;
 using API_de_Inventario.Services.AutenticacionServiceCarpeta;
 using API_de_Inventario.Services.MovimientoServiceCarpeta;
 using API_de_Inventario.Services.ProductoServiceCarpeta;
+using API_de_Inventario.Services.ReporteServiceCarpeta;
 using InventarioAPI.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,8 @@ builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAutenticacionService, AutenticacionService>();
+
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 var app = builder.Build();
 

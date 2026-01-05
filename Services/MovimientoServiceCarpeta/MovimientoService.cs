@@ -1,22 +1,26 @@
 ﻿using API_de_Inventario.DALs;
+using API_de_Inventario.DALs.MovimientoRepositoryCarpeta;
+using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
 using API_de_Inventario.DTOs;
 using API_de_Inventario.Models;
 using InventarioAPI.Shared;
 
-namespace API_de_Inventario.Services
+namespace API_de_Inventario.Services.MovimientoServiceCarpeta
 {
     public class MovimientoService : IMovimientoService
     {
+        private readonly IUnidadDeTrabajo _unidadDeTrabajo;
         private readonly IMovimientoRepository _movimientoRepository;
         private readonly IProductoRepository _productoRepository;
 
-        public MovimientoService(IMovimientoRepository movimientoRepository, IProductoRepository productoRepository)
+        public MovimientoService(IMovimientoRepository movimientoRepository, IProductoRepository productoRepository, IUnidadDeTrabajo unidadDeTrabajo)
         {
             _movimientoRepository = movimientoRepository;
             _productoRepository = productoRepository;
+            _unidadDeTrabajo = unidadDeTrabajo;
         }
 
-        public async Task<Result<MovimientoDto>> CrearMovimiento(MovimientoCrearDto movimientoCrearDto)
+        public async Task<Result<MovimientoDto>> CrearMovimientoAsync(MovimientoCrearDto movimientoCrearDto)
         {
 
             if(movimientoCrearDto.ProductoId <= 0)
@@ -24,7 +28,7 @@ namespace API_de_Inventario.Services
                 return Result<MovimientoDto>.Failure("El productId no puede ser menor o igual a 0");
             }
 
-            var productoExiste = await _productoRepository.ObtenerProductoPorId(movimientoCrearDto.ProductoId);
+            var productoExiste = await _productoRepository.ObtenerProductoPorIdAsync(movimientoCrearDto.ProductoId);
 
             if (productoExiste == null)
             {
@@ -57,7 +61,9 @@ namespace API_de_Inventario.Services
                 FechaMovimiento = DateTime.UtcNow,
             };
 
-            var crearMovimientoEntrada = await _movimientoRepository.CrearMovimiento(movimientoEntradaModel);
+            var crearMovimientoEntrada = _movimientoRepository.CrearMovimiento(movimientoEntradaModel);
+
+            await _unidadDeTrabajo.GuardarCambiosAsync();
 
             var movimientoCreadoDto = new MovimientoDto
             {
@@ -71,7 +77,7 @@ namespace API_de_Inventario.Services
             return Result<MovimientoDto>.Success(movimientoCreadoDto);
         }
 
-        public async Task<Result<int>> ObtenerStockActual(int productoId)
+        public async Task<Result<int>> ObtenerStockActualAsync(int productoId)
         {
 
             if(productoId <= 0)
@@ -79,14 +85,14 @@ namespace API_de_Inventario.Services
                 return Result<int>.Failure("El producto id no puede ser menor o igual a 0");
             }
 
-            var productoExiste = await _productoRepository.ObtenerProductoPorId(productoId);
+            var productoExiste = await _productoRepository.ObtenerProductoPorIdAsync(productoId);
 
             if (productoExiste == null)
             {
                 return Result<int>.Failure($"El producto con id = {productoId} no existe");
             }
 
-            var movimientos = await _movimientoRepository.ObtenerMovimientosPorProducto(productoId);
+            var movimientos = await _movimientoRepository.ObtenerMovimientosPorProductoAsync(productoId);
 
 
             int stockActual = 0;
@@ -106,21 +112,21 @@ namespace API_de_Inventario.Services
             return Result<int>.Success(stockActual);
         }
 
-        public async Task<Result<List<MovimientoDto>>> ObtenerHistorial(int productoId, DateTime? fechaInicio, DateTime? fechaFinal, bool? tipoEntrada, int page, int pageSize)
+        public async Task<Result<List<MovimientoDto>>> ObtenerHistorialAsync(int productoId, DateTime? fechaInicio, DateTime? fechaFinal, bool? tipoEntrada, int page, int pageSize)
         {
             if(productoId <= 0)
             {
                 return Result<List<MovimientoDto>>.Failure("El producto Id no puede ser menor o igual a 0");
             }
 
-            var productoExiste = await _productoRepository.ObtenerProductoPorId(productoId);
+            var productoExiste = await _productoRepository.ObtenerProductoPorIdAsync(productoId);
 
             if(productoExiste == null)
             {
                 return Result<List<MovimientoDto>>.Failure($"El producto con id = {productoId} no existe");
             }
 
-            var movimientosModel = await _movimientoRepository.ObtenerMovimientosPorProductoConFiltros(productoId, fechaInicio, fechaFinal, tipoEntrada, page,pageSize);
+            var movimientosModel = await _movimientoRepository.ObtenerMovimientosPorProductoConFiltrosAsync(productoId, fechaInicio, fechaFinal, tipoEntrada, page,pageSize);
 
             var movimientosDtos = movimientosModel.Select(m => new MovimientoDto
             {

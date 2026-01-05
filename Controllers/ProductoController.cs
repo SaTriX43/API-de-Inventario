@@ -1,6 +1,6 @@
 ﻿using API_de_Inventario.DALs;
 using API_de_Inventario.DTOs;
-using API_de_Inventario.Services;
+using API_de_Inventario.Services.ProductoServiceCarpeta;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,8 +28,8 @@ namespace API_de_Inventario.Controllers
                 });
             }
 
-            var productoCreado = await _productoService.CrearProducto(productoCrearDto);
-
+            var productoCreado = await _productoService.CrearProductoAsync(productoCrearDto);
+            
             if(productoCreado.IsFailure)
             {
                 return BadRequest(new

@@ -2,8 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using InventarioAPI.Middlewares;
 using API_de_Inventario.Models;
-using API_de_Inventario.Services;
+using API_de_Inventario.DALs.MovimientoRepositoryCarpeta;
+using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
 using API_de_Inventario.DALs;
+using API_de_Inventario.Services.MovimientoServiceCarpeta;
+using API_de_Inventario.Services.ProductoServiceCarpeta;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +38,9 @@ builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 
 builder.Services.AddScoped<IMovimientoService, MovimientoService>();
 builder.Services.AddScoped<IMovimientoRepository, MovimientoRepository>();
+
+builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+
 
 var app = builder.Build();
 

@@ -1,5 +1,5 @@
 ﻿using API_de_Inventario.DTOs;
-using API_de_Inventario.Services;
+using API_de_Inventario.Services.MovimientoServiceCarpeta;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +28,7 @@ namespace API_de_Inventario.Controllers
                 });
             }
 
-            var movimientoEntradaCreado = await _movimientoService.CrearMovimiento(movimientoCrearEntrada);
+            var movimientoEntradaCreado = await _movimientoService.CrearMovimientoAsync(movimientoCrearEntrada);
 
             if(movimientoEntradaCreado.IsFailure)
             {
@@ -67,7 +67,7 @@ namespace API_de_Inventario.Controllers
                 });
             }
 
-            var movimientoSalidaCreado = await _movimientoService.CrearMovimiento(movimientoCrearSalida);
+            var movimientoSalidaCreado = await _movimientoService.CrearMovimientoAsync(movimientoCrearSalida);
 
             if (movimientoSalidaCreado.IsFailure)
             {
@@ -97,7 +97,7 @@ namespace API_de_Inventario.Controllers
         [HttpGet("obtener-stock-actual/{productoId}")]
         public async Task<IActionResult> ObtenerStockActual(int productoId)
         {
-            var stockActual = await _movimientoService.ObtenerStockActual(productoId);
+            var stockActual = await _movimientoService.ObtenerStockActualAsync(productoId);
 
             if(stockActual.IsFailure)
             {
@@ -134,7 +134,7 @@ namespace API_de_Inventario.Controllers
             [FromQuery] int pageSize = 10
         )
         {
-            var historial = await _movimientoService.ObtenerHistorial(productoId, fechaInicio, fechaFinal,tipoEntrada ,page, pageSize);
+            var historial = await _movimientoService.ObtenerHistorialAsync(productoId, fechaInicio, fechaFinal,tipoEntrada ,page, pageSize);
 
             if (historial.IsFailure)
             {

@@ -1,7 +1,7 @@
 ﻿using API_de_Inventario.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace API_de_Inventario.DALs
+namespace API_de_Inventario.DALs.MovimientoRepositoryCarpeta
 {
     public class MovimientoRepository : IMovimientoRepository
     {
@@ -12,16 +12,12 @@ namespace API_de_Inventario.DALs
             _context = context;
         }
 
-        public async Task<Movimiento> CrearMovimiento(Movimiento movimiento)
+        public Movimiento CrearMovimiento(Movimiento movimiento)
         {
             _context.Movimientos.Add(movimiento);   
-            await _context.SaveChangesAsync();
             return movimiento;
         }
-
-
-
-        public async Task<List<Movimiento>> ObtenerMovimientosPorProductoConFiltros(int productoId, DateTime? fechaInicio, DateTime? fechaFinal, bool? tipoEntrada, int page, int pageSize)
+        public async Task<List<Movimiento>> ObtenerMovimientosPorProductoConFiltrosAsync(int productoId, DateTime? fechaInicio, DateTime? fechaFinal, bool? tipoEntrada, int page, int pageSize)
         {
             var query = _context.Movimientos.AsQueryable();
 
@@ -52,8 +48,7 @@ namespace API_de_Inventario.DALs
 
             return await query.ToListAsync();
         }
-
-        public async Task<List<Movimiento>> ObtenerMovimientosPorProducto(int productoId)
+        public async Task<List<Movimiento>> ObtenerMovimientosPorProductoAsync(int productoId)
         {
             var movimientos = await _context.Movimientos.Where(m => m.ProductoId == productoId).ToListAsync();
             return movimientos;

@@ -47,8 +47,7 @@ Repositories (DAL)
 │
 Models (EF Core)
 
-yaml
-Copiar código
+
 
 ### Responsabilidades
 - **Controllers**: manejo HTTP

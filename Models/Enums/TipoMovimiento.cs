@@ -1,4 +1,4 @@
-﻿namespace API_de_Inventario.Models
+﻿namespace API_de_Inventario.Models.Enums
 {
     public enum TipoMovimiento
     {

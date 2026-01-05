@@ -7,6 +7,7 @@ namespace API_de_Inventario.Models
 
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Movimiento> Movimientos { get; set; }
+        public DbSet<Usuario> Usuarios => Set<Usuario>();
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -21,6 +22,10 @@ namespace API_de_Inventario.Models
                 .WithOne(m => m.Producto)
                 .HasForeignKey(m => m.ProductoId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Usuario>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
         }
     }
 }

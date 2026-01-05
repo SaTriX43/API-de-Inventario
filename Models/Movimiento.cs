@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using API_de_Inventario.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace API_de_Inventario.Models
 {

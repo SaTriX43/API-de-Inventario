@@ -1,4 +1,5 @@
 ﻿using API_de_Inventario.Models;
+using API_de_Inventario.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace API_de_Inventario.DALs.MovimientoRepositoryCarpeta

@@ -1,7 +1,7 @@
-﻿using API_de_Inventario.Models;
+﻿using API_de_Inventario.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace API_de_Inventario.DTOs
+namespace API_de_Inventario.DTOs.MovimientoDtoCarpeta
 {
     public class MovimientoCrearDto
     {

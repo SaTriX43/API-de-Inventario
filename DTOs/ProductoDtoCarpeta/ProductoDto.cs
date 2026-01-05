@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API_de_Inventario.DTOs
+namespace API_de_Inventario.DTOs.ProductoDtoCarpeta
 {
     public class ProductoDto
     {

@@ -1,12 +1,17 @@
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using InventarioAPI.Middlewares;
-using API_de_Inventario.Models;
+using API_de_Inventario.DALs;
 using API_de_Inventario.DALs.MovimientoRepositoryCarpeta;
 using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
-using API_de_Inventario.DALs;
+using API_de_Inventario.DALs.UsuarioRepositoryCarpeta;
+using API_de_Inventario.Models;
+using API_de_Inventario.Services.AutenticacionServiceCarpeta;
 using API_de_Inventario.Services.MovimientoServiceCarpeta;
 using API_de_Inventario.Services.ProductoServiceCarpeta;
+using InventarioAPI.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +31,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+//jwt
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(opt =>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+        )
+    };
+});
+
+builder.Services.AddAuthorization();
+
 // =======================
 // SERVICES
 // =======================
@@ -41,6 +67,8 @@ builder.Services.AddScoped<IMovimientoRepository, MovimientoRepository>();
 
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IAutenticacionService, AutenticacionService>();
 
 var app = builder.Build();
 
@@ -48,6 +76,9 @@ var app = builder.Build();
 // MIDDLEWARES
 // =======================
 app.UseMiddleware<ErrorHandlerMiddleware>();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {

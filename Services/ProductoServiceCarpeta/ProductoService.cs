@@ -1,6 +1,6 @@
 ﻿using API_de_Inventario.DALs;
 using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
-using API_de_Inventario.DTOs;
+using API_de_Inventario.DTOs.ProductoDtoCarpeta;
 using API_de_Inventario.Models;
 using InventarioAPI.Shared;
 using Microsoft.AspNetCore.Components.Forms;

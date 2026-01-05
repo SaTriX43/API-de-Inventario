@@ -1,5 +1,6 @@
-﻿using API_de_Inventario.DTOs;
+﻿using API_de_Inventario.DTOs.MovimientoDtoCarpeta;
 using API_de_Inventario.Services.MovimientoServiceCarpeta;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace API_de_Inventario.Controllers
             _movimientoService = movimientoService;
         }
 
+        [Authorize]
         [HttpPost("crear-movimiento-entrada")]
         public async Task<IActionResult> CrearMovimientoEntrada([FromBody] MovimientoCrearDto movimientoCrearEntrada)
         {
@@ -54,7 +56,7 @@ namespace API_de_Inventario.Controllers
                 valor = movimientoEntradaCreado.Value
             });
         }
-
+        [Authorize]
         [HttpPost("crear-movimiento-salida")]
         public async Task<IActionResult> CrearMovimientoSalida([FromBody] MovimientoCrearDto movimientoCrearSalida)
         {
@@ -93,7 +95,7 @@ namespace API_de_Inventario.Controllers
                 valor = movimientoSalidaCreado.Value
             });
         }
-
+        [Authorize]
         [HttpGet("obtener-stock-actual/{productoId}")]
         public async Task<IActionResult> ObtenerStockActual(int productoId)
         {
@@ -123,7 +125,7 @@ namespace API_de_Inventario.Controllers
                 valor = stockActual.Value
             });
         }
-
+        [Authorize]
         [HttpGet("obtener-historial/{productoId}")]
         public async Task<IActionResult> ObtenerHistorial(
             int productoId,

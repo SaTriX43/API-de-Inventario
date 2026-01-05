@@ -1,4 +1,4 @@
-﻿using API_de_Inventario.DTOs;
+﻿using API_de_Inventario.DTOs.MovimientoDtoCarpeta;
 using InventarioAPI.Shared;
 
 namespace API_de_Inventario.Services.MovimientoServiceCarpeta

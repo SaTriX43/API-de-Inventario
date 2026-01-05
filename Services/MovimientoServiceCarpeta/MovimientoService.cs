@@ -1,8 +1,9 @@
 ﻿using API_de_Inventario.DALs;
 using API_de_Inventario.DALs.MovimientoRepositoryCarpeta;
 using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
-using API_de_Inventario.DTOs;
+using API_de_Inventario.DTOs.MovimientoDtoCarpeta;
 using API_de_Inventario.Models;
+using API_de_Inventario.Models.Enums;
 using InventarioAPI.Shared;
 
 namespace API_de_Inventario.Services.MovimientoServiceCarpeta
@@ -43,7 +44,7 @@ namespace API_de_Inventario.Services.MovimientoServiceCarpeta
             if(movimientoCrearDto.Tipo == TipoMovimiento.Salida)
             {
 
-                var stockActual = await ObtenerStockActual(movimientoCrearDto.ProductoId);
+                var stockActual = await ObtenerStockActualAsync(movimientoCrearDto.ProductoId);
 
                 if(movimientoCrearDto.Cantidad > stockActual.Value)
                 {

@@ -1,6 +1,7 @@
 ﻿using API_de_Inventario.DALs;
-using API_de_Inventario.DTOs;
+using API_de_Inventario.DTOs.ProductoDtoCarpeta;
 using API_de_Inventario.Services.ProductoServiceCarpeta;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace API_de_Inventario.Controllers
             _productoService = productoService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("crear-producto")]
         public async Task<IActionResult> CrearProducto([FromBody] ProductoCrearDto productoCrearDto)
         {

@@ -46,6 +46,28 @@ namespace API_de_Inventario.Controllers
                 valor = stockActual.Value
             });
         }
+
+        [Authorize]
+        [HttpGet("obtener-productos-stock-actual")]
+        public async Task<IActionResult> ObtenerProductosStockActual()
+        {
+            var stockActual = await _reporteService.ObtenerProductosStockActualAsync();
+
+            if (stockActual.IsFailure)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    error = stockActual.Error
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                valor = stockActual.Value
+            });
+        }
         [Authorize]
         [HttpGet("obtener-historial/{productoId}")]
         public async Task<IActionResult> ObtenerHistorial(

@@ -2,6 +2,7 @@
 using API_de_Inventario.DALs.MovimientoRepositoryCarpeta;
 using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
 using API_de_Inventario.DTOs.MovimientoDtoCarpeta;
+using API_de_Inventario.DTOs.ReporteDtoCarpeta;
 using API_de_Inventario.Models.Enums;
 using InventarioAPI.Shared;
 
@@ -78,6 +79,36 @@ namespace API_de_Inventario.Services.ReporteServiceCarpeta
             }).ToList();
 
             return Result<List<MovimientoDto>>.Success(movimientosDtos);
+        }
+
+        public async Task<Result<List<StockActualRespuestaDto>>> ObtenerProductosStockActualAsync()
+        {
+            var productos = await _productoRepository.ObtenerProductosAsync();
+
+            var stockActualRespuestaDto = new List<StockActualRespuestaDto>();
+
+            foreach(var producto in productos)
+            {
+                var productoId = producto.Id;
+                var productoName = producto.Nombre;
+
+                var stockActualResult = await ObtenerStockActualAsync(productoId);
+                var stockActual = stockActualResult.Value;
+                var ultimoMovimiento = await _movimientoRepository.ObtenerUltimoMovimientoPorProductoId(productoId);
+                var fechaUltimoMovimiento = ultimoMovimiento.FechaMovimiento;
+
+                
+
+                stockActualRespuestaDto.Add(new StockActualRespuestaDto
+                {
+                    ProductoId = productoId,
+                    ProductoNombre = producto.Nombre,
+                    StockActual = stockActual,
+                    FechaUltimoMovimiento = fechaUltimoMovimiento,
+                });
+            }
+
+            return Result<List<StockActualRespuestaDto>>.Success(stockActualRespuestaDto);
         }
     }
 }

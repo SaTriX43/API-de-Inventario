@@ -54,5 +54,11 @@ namespace API_de_Inventario.DALs.MovimientoRepositoryCarpeta
             var movimientos = await _context.Movimientos.Where(m => m.ProductoId == productoId).ToListAsync();
             return movimientos;
         }
+
+        public async Task<Movimiento?> ObtenerUltimoMovimientoPorProductoId(int productoId)
+        {
+            var movimiento = await _context.Movimientos.Where(m => m.ProductoId == productoId).OrderByDescending(m => m.FechaMovimiento).FirstOrDefaultAsync();
+            return movimiento;
+        }
     }
 }

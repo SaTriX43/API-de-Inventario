@@ -1,4 +1,4 @@
-using API_de_Inventario.DALs;
+﻿using API_de_Inventario.DALs;
 using API_de_Inventario.DALs.MovimientoRepositoryCarpeta;
 using API_de_Inventario.DALs.ProductoRepositoryCarpeta;
 using API_de_Inventario.DALs.UsuarioRepositoryCarpeta;
@@ -10,8 +10,10 @@ using API_de_Inventario.Services.ReporteServiceCarpeta;
 using InventarioAPI.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,24 +36,25 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //jwt
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(opt =>
-{
-    opt.RequireHttpsMetadata = false; 
-    opt.SaveToken = true;
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
-    opt.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-        )
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
 
@@ -110,7 +113,6 @@ var app = builder.Build();
 // =======================
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
-app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -4,6 +4,7 @@ using API_de_Inventario.DTOs.AutenticacionDtoCarpeta;
 using API_de_Inventario.Models;
 using API_de_Inventario.Models.Enums;
 using InventarioAPI.Shared;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -71,30 +72,37 @@ namespace API_de_Inventario.Services.AutenticacionServiceCarpeta
 
         private string GenerarJwt(Usuario usuario)
         {
+            var jwt = _config.GetSection("Jwt");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]));
+
+            // 2. Claims del usuario
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-            new Claim(ClaimTypes.Email, usuario.Email),
-            new Claim(ClaimTypes.Role, usuario.Rol.ToString())
-        };
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                new Claim(ClaimTypes.Name, usuario.Name),
+                new Claim(ClaimTypes.Role, usuario.Rol.ToString()),
+                new Claim(ClaimTypes.Email, usuario.Email),
+            };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"]!)
-            );
-
+            // 3. Crear credenciales de firma
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(
-                    int.Parse(_config["Jwt:ExpiresInMinutes"]!)
-                ),
-                signingCredentials: creds
-            );
+            // 4. Descriptor del token (la plantilla)
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                Issuer = jwt["Issuer"],
+                Audience = jwt["Audience"],
+                SigningCredentials = creds
+            };
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            // 5. Crear el token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // 6. Convertir a string
+            return tokenHandler.WriteToken(token);
         }
     }
 

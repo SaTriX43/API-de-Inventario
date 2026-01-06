@@ -47,7 +47,7 @@ namespace API_de_Inventario.Controllers
             });
         }
 
-        [Authorize]
+       
         [HttpGet("obtener-productos-stock-actual")]
         public async Task<IActionResult> ObtenerProductosStockActual()
         {
@@ -68,6 +68,29 @@ namespace API_de_Inventario.Controllers
                 valor = stockActual.Value
             });
         }
+
+        [HttpGet("obtener-productos-stock-bajo")]
+        public async Task<IActionResult> ObtenerProductosStockBajo()
+        {
+            var stockActual = await _reporteService.ObtenerProductosConStockBajo();
+
+            if (stockActual.IsFailure)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    error = stockActual.Error
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                valor = stockActual.Value
+            });
+        }
+
+
         [Authorize]
         [HttpGet("obtener-historial/{productoId}")]
         public async Task<IActionResult> ObtenerHistorial(

@@ -81,11 +81,11 @@ namespace API_de_Inventario.Services.ReporteServiceCarpeta
             return Result<List<MovimientoDto>>.Success(movimientosDtos);
         }
 
-        public async Task<Result<List<StockActualRespuestaDto>>> ObtenerProductosStockActualAsync()
+        public async Task<Result<List<StockRespuestaDto>>> ObtenerProductosStockActualAsync()
         {
             var productos = await _productoRepository.ObtenerProductosAsync();
 
-            var stockActualRespuestaDto = new List<StockActualRespuestaDto>();
+            var stockActualRespuestaDto = new List<StockRespuestaDto>();
 
             foreach(var producto in productos)
             {
@@ -93,13 +93,22 @@ namespace API_de_Inventario.Services.ReporteServiceCarpeta
                 var productoName = producto.Nombre;
 
                 var stockActualResult = await ObtenerStockActualAsync(productoId);
+
+                if(stockActualResult.IsFailure)
+                {
+                    return Result<List<StockRespuestaDto>>.Failure(stockActualResult.Error);
+                }
+
                 var stockActual = stockActualResult.Value;
                 var ultimoMovimiento = await _movimientoRepository.ObtenerUltimoMovimientoPorProductoId(productoId);
-                var fechaUltimoMovimiento = ultimoMovimiento.FechaMovimiento;
+
+
+
+                var fechaUltimoMovimiento = ultimoMovimiento?.FechaMovimiento;
 
                 
 
-                stockActualRespuestaDto.Add(new StockActualRespuestaDto
+                stockActualRespuestaDto.Add(new StockRespuestaDto
                 {
                     ProductoId = productoId,
                     ProductoNombre = producto.Nombre,
@@ -108,7 +117,43 @@ namespace API_de_Inventario.Services.ReporteServiceCarpeta
                 });
             }
 
-            return Result<List<StockActualRespuestaDto>>.Success(stockActualRespuestaDto);
+            return Result<List<StockRespuestaDto>>.Success(stockActualRespuestaDto);
+        }
+
+        public async Task<Result<List<StockRespuestaDto>>> ObtenerProductosConStockBajo()
+        {
+            var productos = await _productoRepository.ObtenerProductosAsync();
+
+            var stockBajoRespuestaDto = new List<StockRespuestaDto>();
+
+            foreach (var producto in productos)
+            {
+                var stockActualResult = await ObtenerStockActualAsync(producto.Id);
+
+                if (stockActualResult.IsFailure)
+                {
+                    return Result<List<StockRespuestaDto>>.Failure(stockActualResult.Error);
+                }
+
+                var stockActual = stockActualResult.Value;
+                const int STOCK_BAJO_LIMITE = 30;
+                if (stockActual < STOCK_BAJO_LIMITE)
+                {
+                    var productoId = producto.Id;
+                    var productoName = producto.Nombre;
+                    var ultimoMovimiento = await _movimientoRepository.ObtenerUltimoMovimientoPorProductoId(productoId);
+                    var fechaUltimoMovimiento = ultimoMovimiento?.FechaMovimiento;
+                    stockBajoRespuestaDto.Add(new StockRespuestaDto
+                    {
+                        ProductoId = productoId,
+                        ProductoNombre = producto.Nombre,
+                        StockActual = stockActual,
+                        FechaUltimoMovimiento = fechaUltimoMovimiento,
+                    });
+                }
+            }
+
+            return Result<List<StockRespuestaDto>>.Success(stockBajoRespuestaDto);
         }
     }
 }

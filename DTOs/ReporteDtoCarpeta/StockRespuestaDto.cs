@@ -1,6 +1,6 @@
 ﻿namespace API_de_Inventario.DTOs.ReporteDtoCarpeta
 {
-    public class StockActualRespuestaDto
+    public class StockRespuestaDto
     {
         public int ProductoId { get; set; }
         public string ProductoNombre { get; set; }

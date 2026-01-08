@@ -47,7 +47,7 @@ namespace API_de_Inventario.Controllers
             });
         }
 
-       
+        [Authorize]
         [HttpGet("obtener-productos-stock-actual")]
         public async Task<IActionResult> ObtenerProductosStockActual()
         {
@@ -69,6 +69,7 @@ namespace API_de_Inventario.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("obtener-productos-stock-bajo")]
         public async Task<IActionResult> ObtenerProductosStockBajo()
         {
